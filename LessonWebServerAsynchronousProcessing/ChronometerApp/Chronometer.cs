@@ -2,8 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Threading;
-    using ThreadState = System.Threading.ThreadState;
 
     public class Chronometer : IChronometer
     {
@@ -35,7 +33,6 @@
         public void Reset()
         {
             _stopwatch.Reset();
-            _isTrue = false;
             Laps.RemoveRange(0, Laps.Count);
             
         }
@@ -43,7 +40,6 @@
         public void Start()
         {
             _stopwatch.Start();
-            _isTrue = true;
         }
 
         public void Stop()
