@@ -4,7 +4,7 @@
 
     public static class ChronometerCommands
     {
-        public static void SetChronometerCommand(this string command, IChronometer chronometer)
+        public static void SetChronometerCommand(this IChronometer chronometer, string command)
         {
             switch (command)
             {

@@ -15,7 +15,7 @@ namespace ChronometerApp
 
             while (true)
             {
-                 Console.ReadLine().SetChronometerCommand(chronometer);
+                 chronometer.SetChronometerCommand(Console.ReadLine());
             }
         }
     }
