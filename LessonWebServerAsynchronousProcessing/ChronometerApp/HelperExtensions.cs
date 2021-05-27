@@ -5,7 +5,7 @@
     using System.Reflection;
     using CommandModels;
 
-    public static class ChronometerCommands
+    public static class HelperExtensions
     {
         public static void SetCommand(this IChronometer chronometer, string command)
         {
