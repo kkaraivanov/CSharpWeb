@@ -12,11 +12,9 @@ namespace ChronometerApp
         private static void ChronometerRun()
         {
             IChronometer chronometer = new Chronometer();
-
-            while (true)
-            {
-                 chronometer.SetChronometerCommand(Console.ReadLine());
-            }
+            ICommandReader reader = new CommandReader();
+            IChronometerEngine engine = new ChronometerEngine(chronometer, reader);
+            engine.Run();
         }
     }
 }
