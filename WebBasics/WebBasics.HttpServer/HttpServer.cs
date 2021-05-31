@@ -2,74 +2,153 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
     using System.Threading.Tasks;
 
-    public class HttpServer
+    public class HttpServer : IHttpServer
     {
-        private readonly IPAddress _ipAddress;
-        private readonly int _port;
-        private readonly TcpListener _listener;
+        private readonly List<Route> _routTable;
         private readonly ConsoleColor _consoleColor;
+        private IPAddress _ipAddress;
+        private int _port;
+        private TcpListener _listener;
 
-        public HttpServer(int port, string ipAddress = null)
+        public HttpServer()
+        {
+            _routTable = new List<Route>();
+            _consoleColor = Console.ForegroundColor;
+        }
+
+        public HttpServer(List<Route> routTable)
+            :this()
+        {
+            _routTable = routTable;
+        }
+
+        public async Task Run(int port, string ipAddress = null)
         {
             _ipAddress = ipAddress != null ? IPAddress.Parse(ipAddress) : IPAddress.Loopback;
             _port = port;
             _listener = new TcpListener(_ipAddress, _port);
-            _consoleColor = Console.ForegroundColor;
-        }
 
-        public async Task Start()
-        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Server started at http://{_ipAddress.ToString()}:{_port}");
+
             _listener.Start();
 
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine($"Server started on IP address {_ipAddress.ToString()} with port {_port}...");
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("Listening for requests...");
-            Console.ForegroundColor = _consoleColor;
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"Connection is started");
+            //Console.WriteLine("Waiting for request...");
+            Console.WriteLine();
 
             while (true)
             {
-                var connection = await _listener.AcceptTcpClientAsync();
-                await ConnectionRead(connection);
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("Waiting for new request...");
+                var client = await _listener.AcceptTcpClientAsync();
+                await Listen(client);
             }
         }
 
-        private async Task ConnectionRead(TcpClient client)
+        private async Task Listen(TcpClient client)
         {
             try
             {
                 using NetworkStream stream = client.GetStream();
                 var requestBytes = await ReadRequest(stream);
                 var requestText = Encoding.UTF8.GetString(requestBytes);
-                Console.WriteLine(requestText);
-
                 var request = new HttpRequest(requestText);
-                var content = "Hallo my world";
-                var response = new HttpResponse("text/html; charset=UTF-8", content);
-                response.Headers.Add(new HttpHeader("Server", ServerConstants.ServerName));
-                response.Headers.Add(new HttpHeader("Date", $"{DateTime.UtcNow:r}"));
 
-                var responseText = response.ToString();
-                ;
-                var responseHeader = Encoding.UTF8.GetBytes(responseText);
-                
-                await stream.WriteAsync(responseHeader);
-                if (!string.IsNullOrEmpty(response.Content))
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Incoming request...");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"Method \"{request.Method}\"");
+                Console.WriteLine($"Request url http://{_ipAddress.ToString()}:{_port}{request.Url}");
+                Console.WriteLine($"Headers count {request.Headers.Count} headers");
+                Console.WriteLine($"Cookies {request.Cookies.FirstOrDefault()?.Name}: {request.Cookies.FirstOrDefault()?.Value}");
+
+                if (_routTable.Any())
                 {
-                    var responseContent = Encoding.UTF8.GetBytes(response.Content);
-                    await stream.WriteAsync(responseContent, 0, responseContent.Length);
+                    await MakeResponse(stream, request);
                 }
-                //await WriteResponse(stream);
+                else
+                {
+                    var content = "Hallo my world";
+                    var response = new HttpResponse("text/html; charset=UTF-8", content);
+                    response.Headers.Add(new HttpHeader("Server", ServerConstants.ServerName));
+                    response.Headers.Add(new HttpHeader("Date", $"{DateTime.UtcNow:r}"));
+
+                    var session = request.Cookies.FirstOrDefault(x => x.Name == ServerConstants.CookieName);
+                    ;
+                    if (session != null)
+                    {
+                        var sendingCookie = new SendingCookie(session.Name, session.Value);
+                        sendingCookie.Url = "/";
+                        response.Cookies.Add(sendingCookie);
+                    }
+
+                    var responseText = response.ToString();
+                    var responseHeader = Encoding.UTF8.GetBytes(responseText);
+                    await stream.WriteAsync(responseHeader);
+                    
+                    if (!string.IsNullOrEmpty(response.Content))
+                    {
+                        var responseContent = Encoding.UTF8.GetBytes(response.Content);
+                        await stream.WriteAsync(responseContent, 0, responseContent.Length);
+                    }
+                    
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"Server send response...");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine(responseText.TrimEnd('\n', '\r'));
+                }
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Client connection is closed...");
+                Console.WriteLine();
                 client.Close();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+            }
+        }
+
+        private async Task MakeResponse(NetworkStream stream, HttpRequest request)
+        {
+            HttpResponse response;
+            var route = _routTable
+                .FirstOrDefault(x =>
+                    String.Compare(x.Url, request.Url, StringComparison.OrdinalIgnoreCase) == 0 &&
+                    x.Method == request.Method);
+
+            response = route != null ?
+                route.Action(request) :
+                new HttpResponse("text/html; charset=UTF-8", string.Empty, HttpStatusCode.NotFound);
+
+            response.Headers.Add(new HttpHeader("Server", ServerConstants.ServerName));
+            response.Headers.Add(new HttpHeader("Date", $"{DateTime.UtcNow:r}"));
+
+            var session = request.Cookies.FirstOrDefault(x => x.Name == ServerConstants.CookieName);
+            if (session != null)
+            {
+                var sendingCookie = new SendingCookie(session.Name, session.Value);
+                sendingCookie.Url = "/";
+                response.Cookies.Add(sendingCookie);
+
+            }
+
+            var responseText = response.ToString();
+            var responseHeaders = Encoding.UTF8.GetBytes(responseText);
+            await stream.WriteAsync(responseHeaders);
+
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                var responseContent = Encoding.UTF8.GetBytes(response.Content);
+                await stream.WriteAsync(responseContent, 0, responseContent.Length);
             }
         }
 
@@ -98,32 +177,6 @@
             }
 
             return result.ToArray();
-        }
-
-        private async Task WriteResponse(NetworkStream networkStream)
-        {
-            var content = @"
-<html>
-    <head>
-        <link rel=""icon"" href=""data:,"">
-    </head>
-    <body>
-        Hello from my server!
-    </body>
-</html>";
-            var contentLength = Encoding.UTF8.GetByteCount(content);
-
-            var response = $@"
-HTTP/1.1 200 OK
-Server: My Web Server
-Date: {DateTime.UtcNow:r}
-Content-Length: {contentLength}
-Content-Type: text/html; charset=UTF-8
-{content}";
-
-            var responseBytes = Encoding.UTF8.GetBytes(response);
-
-            await networkStream.WriteAsync(responseBytes);
         }
     }
 }

@@ -4,16 +4,18 @@
 
     public class HttpHeaderCollection
     {
-        private readonly Dictionary<string, HttpHeader> headers;
+        private readonly Dictionary<string, HttpHeader> _headers;
 
-        public HttpHeaderCollection()
-            => this.headers = new Dictionary<string, HttpHeader>();
+        public HttpHeaderCollection() => 
+            _headers = new Dictionary<string, HttpHeader>();
 
-        public int Count => this.headers.Count;
+        public int Count => 
+            _headers.Count;
 
-        public void Add(HttpHeader header)
-            => this.headers.Add(header.Name, header);
+        public void Add(HttpHeader header) => 
+            _headers.Add(header.Name, header);
 
-        public IReadOnlyDictionary<string, HttpHeader> Headers => headers;
+        public IReadOnlyDictionary<string, HttpHeader> Headers => 
+            _headers;
     }
 }
