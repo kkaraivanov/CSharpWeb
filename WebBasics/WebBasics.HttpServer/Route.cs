@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class Route
+    public class Route : IRouteTable
     {
         public Route(string url, HttpMethod method, Func<HttpRequest, HttpResponse> action)
         {

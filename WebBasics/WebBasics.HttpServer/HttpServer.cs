@@ -7,6 +7,8 @@
     using System.Net.Sockets;
     using System.Text;
     using System.Threading.Tasks;
+    using Exceptions;
+    using Helpers;
 
     public class HttpServer : IHttpServer
     {
@@ -28,7 +30,7 @@
             _routTable = routTable;
         }
 
-        public async Task Run(int port, string ipAddress = null)
+        public void Run(int port, string ipAddress = null)
         {
             _ipAddress = ipAddress != null ? IPAddress.Parse(ipAddress) : IPAddress.Loopback;
             _port = port;
@@ -41,20 +43,23 @@
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"Connection is started");
-            //Console.WriteLine("Waiting for request...");
             Console.WriteLine();
 
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("Waiting for new request...");
-                var client = await _listener.AcceptTcpClientAsync();
-                await Listen(client);
+                var client = _listener.AcceptTcpClientAsync().GetAwaiter().GetResult();
+                Task.Run(() =>
+                {
+                    if (client != null) Listen(client);
+                });
             }
         }
 
         private async Task Listen(TcpClient client)
         {
+            HttpResponse response;
             try
             {
                 using NetworkStream stream = client.GetStream();
@@ -68,7 +73,8 @@
                 Console.WriteLine($"Method \"{request.Method}\"");
                 Console.WriteLine($"Request url http://{_ipAddress.ToString()}:{_port}{request.Url}");
                 Console.WriteLine($"Headers count {request.Headers.Count} headers");
-                Console.WriteLine($"Cookies {request.Cookies.FirstOrDefault()?.Name}: {request.Cookies.FirstOrDefault()?.Value}");
+                Console.WriteLine(
+                    $"Cookies {request.Cookies.FirstOrDefault()?.Name}: {request.Cookies.FirstOrDefault()?.Value}");
 
                 if (_routTable.Any())
                 {
@@ -77,12 +83,12 @@
                 else
                 {
                     var content = "Hallo my world";
-                    var response = new HttpResponse("text/html; charset=UTF-8", content);
+                    response = new HttpResponse("text/html; charset=UTF-8", content);
                     response.Headers.Add(new HttpHeader("Server", ServerConstants.ServerName));
                     response.Headers.Add(new HttpHeader("Date", $"{DateTime.UtcNow:r}"));
 
                     var session = request.Cookies.FirstOrDefault(x => x.Name == ServerConstants.CookieName);
-                    ;
+                    
                     if (session != null)
                     {
                         var sendingCookie = new SendingCookie(session.Name, session.Value);
@@ -93,13 +99,13 @@
                     var responseText = response.ToString();
                     var responseHeader = Encoding.UTF8.GetBytes(responseText);
                     await stream.WriteAsync(responseHeader);
-                    
+
                     if (!string.IsNullOrEmpty(response.Content))
                     {
                         var responseContent = Encoding.UTF8.GetBytes(response.Content);
                         await stream.WriteAsync(responseContent, 0, responseContent.Length);
                     }
-                    
+
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"Server send response...");
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -111,9 +117,13 @@
                 Console.WriteLine();
                 client.Close();
             }
+            catch (BadRequestException be)
+            {
+                response = new TextResult(String.Empty, be.Message, HttpStatusCode.BadRequest);
+            }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                response = new TextResult(String.Empty, e.Message, HttpStatusCode.ServerError);
             }
         }
 

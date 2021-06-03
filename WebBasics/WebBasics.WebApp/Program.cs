@@ -1,17 +1,34 @@
-﻿using System;
-
-namespace WebBasics.WebApp
+﻿namespace WebBasics.WebApp
 {
-    using System.Threading.Tasks;
+    using System;
+    using System.Collections.Generic;
     using HttpServer;
+    using ServerFramework;
 
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             int port = 8080;
-            var server = new HttpServer();
-            await server.Run(port);
+            HostBuilder(port).Run();
+        }
+
+        public static IWebHostBuilder HostBuilder(int port) =>
+            ServerHost.CreateHost()
+                .ConfigureWebHostBuilder( new Startup(), port);
+    }
+
+    internal class Startup : IServerFramework
+    {
+        public void ConfigureServices(IServiceCollection serviceCollection)
+        {
+            
+        }
+
+        public void Configure(List<Route> routeTable)
+        {
+            HttpServer server = new HttpServer(routeTable);
+            
         }
     }
 }

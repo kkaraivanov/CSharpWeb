@@ -7,6 +7,13 @@
 
     public class HttpResponse
     {
+        public HttpResponse(HttpStatusCode statusCode)
+        {
+            StatusCode = statusCode;
+            Headers = new HttpHeaderCollection();
+            Cookies = new List<Cookie>();
+        }
+
         public HttpResponse(string contentType, string content, HttpStatusCode statusCode = HttpStatusCode.OK)
         {
             if (content == null)
