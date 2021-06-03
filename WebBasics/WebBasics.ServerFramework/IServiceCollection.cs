@@ -17,14 +17,14 @@
 
         public void Add<TSource, TDestination>()
         {
-            this._dependencyContainer[typeof(TSource)] = typeof(TDestination);
+            _dependencyContainer[typeof(TSource)] = typeof(TDestination);
         }
 
         public object CreateInstance(Type type)
         {
-            if (this._dependencyContainer.ContainsKey(type))
+            if (_dependencyContainer.ContainsKey(type))
             {
-                type = this._dependencyContainer[type];
+                type = _dependencyContainer[type];
             }
 
             var constructor = type.GetConstructors()
