@@ -1,5 +1,6 @@
 ﻿namespace WebBasics.ServerFramework
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Extensions;
@@ -7,24 +8,23 @@
 
     public static class ServerHost
     {
-        private static IWebHostBuilder _host;
-
-        public static IWebHostBuilder CreateHost()
-        {
-            _host = new WebHostBuilder();
-            return _host;
-        }
-
-        public static IHttpServer CreateHostAsync(IServerFramework serverFramework)
+        public static async Task CreateHost(IServerFramework serverFramework)
         {
             List<Route> routeTable = new List<Route>();
             IServiceCollection serviceCollection = new ServiceCollection();
 
             serverFramework.ConfigureServices(serviceCollection);
             serverFramework.Configure(routeTable);
-
+            ;
             routeTable.Register(serverFramework, serviceCollection);
-            return new HttpServer();
+
+            foreach (var route in routeTable)
+            {
+                Console.WriteLine($"{route.Method} {route.Url}");
+            }
+
+            IHttpServer server = new HttpServer(routeTable);
+            await server.Run(80);
         }
     }
 }

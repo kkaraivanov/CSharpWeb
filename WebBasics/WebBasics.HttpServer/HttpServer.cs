@@ -13,47 +13,32 @@
     public class HttpServer : IHttpServer
     {
         private readonly List<Route> _routTable;
-        private readonly ConsoleColor _consoleColor;
-        private IPAddress _ipAddress;
+        private string _ipAddress;
         private int _port;
-        private TcpListener _listener;
-
-        public HttpServer()
-        {
-            _routTable = new List<Route>();
-            _consoleColor = Console.ForegroundColor;
-        }
 
         public HttpServer(List<Route> routTable)
-            :this()
         {
             _routTable = routTable;
         }
 
-        public void Run(int port, string ipAddress = null)
+        public async Task Run(int port, string ipAddress = null)
         {
-            _ipAddress = ipAddress != null ? IPAddress.Parse(ipAddress) : IPAddress.Loopback;
+            var address = ipAddress != null ? IPAddress.Parse(ipAddress) : IPAddress.Loopback;
+            _ipAddress = address.ToString();
             _port = port;
-            _listener = new TcpListener(_ipAddress, _port);
-
-            Console.ForegroundColor = ConsoleColor.Green;
+            var listener = new TcpListener(address, _port);
             Console.WriteLine($"Server started at http://{_ipAddress.ToString()}:{_port}");
 
-            _listener.Start();
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
+            listener.Start();
             Console.WriteLine($"Connection is started");
             Console.WriteLine();
 
             while (true)
             {
-                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("Waiting for new request...");
-                var client = _listener.AcceptTcpClientAsync().GetAwaiter().GetResult();
-                Task.Run(() =>
-                {
-                    if (client != null) Listen(client);
-                });
+                var client = await listener.AcceptTcpClientAsync();
+
+                await Listen(client);
             }
         }
 
@@ -67,14 +52,11 @@
                 var requestText = Encoding.UTF8.GetString(requestBytes);
                 var request = new HttpRequest(requestText);
 
-                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Incoming request...");
-                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine($"Method \"{request.Method}\"");
                 Console.WriteLine($"Request url http://{_ipAddress.ToString()}:{_port}{request.Url}");
                 Console.WriteLine($"Headers count {request.Headers.Count} headers");
-                Console.WriteLine(
-                    $"Cookies {request.Cookies.FirstOrDefault()?.Name}: {request.Cookies.FirstOrDefault()?.Value}");
+                Console.WriteLine($"Cookies {request.Cookies.FirstOrDefault()?.Name}: {request.Cookies.FirstOrDefault()?.Value}");
 
                 if (_routTable.Any())
                 {
@@ -106,13 +88,10 @@
                         await stream.WriteAsync(responseContent, 0, responseContent.Length);
                     }
 
-                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"Server send response...");
-                    Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine(responseText.TrimEnd('\n', '\r'));
                 }
 
-                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Client connection is closed...");
                 Console.WriteLine();
                 client.Close();

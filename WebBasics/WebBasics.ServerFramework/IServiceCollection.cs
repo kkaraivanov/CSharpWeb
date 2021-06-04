@@ -11,7 +11,7 @@
         object CreateInstance(Type type);
     }
 
-    class ServiceCollection : IServiceCollection
+    public class ServiceCollection : IServiceCollection
     {
         private readonly Dictionary<Type, Type> _dependencyContainer = new Dictionary<Type, Type>();
 

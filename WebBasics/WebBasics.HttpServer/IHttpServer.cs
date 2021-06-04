@@ -4,6 +4,6 @@
 
     public interface IHttpServer
     {
-        void Run(int port, string ipAddress = null);
+        Task Run(int port, string ipAddress = null);
     }
 }

@@ -7,7 +7,7 @@
         string GetHtml(string template, object model, string user);
     }
 
-    class ViewEngine : IViewEngine
+    public class ViewEngine : IViewEngine
     {
         public string GetHtml(string template, object model, string user)
         {

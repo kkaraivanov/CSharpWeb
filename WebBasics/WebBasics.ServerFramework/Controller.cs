@@ -9,7 +9,7 @@
     public class Controller
     {
         private const string UserSessionId = "UserId";
-        private ViewEngine _viewEngine;
+        private IViewEngine _viewEngine;
 
         public Controller()
         {

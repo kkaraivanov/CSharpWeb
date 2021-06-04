@@ -15,7 +15,7 @@ namespace WebBasics.ServerFramework
         public IWebHostBuilder ConfigureWebHostBuilder(IServerFramework serverFramework, int port)
         {
             _httpPort = port;
-            _httpServer = ServerHost.CreateHostAsync(serverFramework);
+            //_httpServer = ServerHost.CreateHostAsync(serverFramework);
             ;
 
             return this;

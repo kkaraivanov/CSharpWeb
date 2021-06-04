@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBasics.HttpServer", "Web
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebBasics.WebApp", "WebBasics\WebBasics.WebApp\WebBasics.WebApp.csproj", "{0826EA08-5B8B-4007-8B21-DC1121C311E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBasics.ServerFramework", "WebBasics\WebBasics.ServerFramework\WebBasics.ServerFramework.csproj", "{C9CE6B20-C08C-40C1-83C1-4FB11818B159}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,10 +37,6 @@ Global
 		{0826EA08-5B8B-4007-8B21-DC1121C311E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0826EA08-5B8B-4007-8B21-DC1121C311E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0826EA08-5B8B-4007-8B21-DC1121C311E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C9CE6B20-C08C-40C1-83C1-4FB11818B159}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C9CE6B20-C08C-40C1-83C1-4FB11818B159}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C9CE6B20-C08C-40C1-83C1-4FB11818B159}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C9CE6B20-C08C-40C1-83C1-4FB11818B159}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,7 +46,6 @@ Global
 		{5F086870-715C-4B16-8112-03543B737E27} = {1BB053F5-4003-4E68-9872-2820EE4EB6FE}
 		{4897CA72-2B40-44A2-9E51-49846323AE0F} = {2141EFDB-EC9C-49B4-8020-03C1E8824D10}
 		{0826EA08-5B8B-4007-8B21-DC1121C311E7} = {2141EFDB-EC9C-49B4-8020-03C1E8824D10}
-		{C9CE6B20-C08C-40C1-83C1-4FB11818B159} = {2141EFDB-EC9C-49B4-8020-03C1E8824D10}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64502C5A-95EB-4278-8D50-81019278A02A}
