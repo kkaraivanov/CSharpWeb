@@ -1,17 +1,32 @@
 ﻿namespace ExamHelperLibrary.Template
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using FrameworkServer.Controllers;
     using FrameworkServer.Http;
     using Services;
 
     public class BaseControllerTemplate : Controller
     {
-        protected ObjectAttributeValidator AttributeValidator;
+        private IValidator _attributeValidator;
 
-        protected HttpResponse Refresh() => 
-            Redirect("/");
+        protected bool ModelIsVlaid(object obj) =>
+            _attributeValidator
+                .ModelIsValid(obj);
+
+        protected List<string> Errors =>
+            _attributeValidator
+                .Errors
+                .ToList();
+
+        protected void AddError(string error) =>
+            _attributeValidator
+                .AddError(error);
 
         protected BaseControllerTemplate() =>
-            AttributeValidator = new ObjectAttributeValidator();
+            _attributeValidator = new Validator();
+
+        protected HttpResponse Refresh() =>
+            Redirect("/");
     }
 }

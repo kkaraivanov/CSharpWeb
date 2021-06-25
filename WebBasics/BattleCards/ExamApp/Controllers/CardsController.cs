@@ -55,16 +55,19 @@
                 Health = int.Parse(parse["health"])
             };
 
-            var validator = AttributeValidator.Validate(obj);
+            if (!ModelIsVlaid(obj))
+            {
+                return Error(Errors);
+            }
 
             if (_context.Cards.Any(x => x.Name == obj.Name))
             {
-                validator.Errors.Add("This card name already exist.");
+                Errors.Add("This card name already exist.");
             }
 
-            if (validator.Errors.Any())
+            if (Errors.Any())
             {
-                return Error(validator.Errors);
+                return Error(Errors);
             }
 
             var card = new Card

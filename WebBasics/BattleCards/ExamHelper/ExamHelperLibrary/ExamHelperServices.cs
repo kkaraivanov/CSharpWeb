@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ExamHelperLibrary
+﻿namespace ExamHelperLibrary
 {
     using Data;
     using FrameworkServer;
@@ -14,6 +12,7 @@ namespace ExamHelperLibrary
         {
             service.Add<ApplicationDbContext>();
             service.Add<IPasswordHasher, PasswordHasher>();
+            service.Add<IValidator, Validator>();
             return service;
         }
 

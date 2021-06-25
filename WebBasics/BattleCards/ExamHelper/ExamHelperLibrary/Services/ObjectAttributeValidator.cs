@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using System.Linq;
     using System.Reflection;
 
     public class ObjectAttributeValidator
@@ -41,15 +40,5 @@
 
             return result;
         }
-    }
-
-    public class ValidatorResult
-    {
-        public bool IsValid => !Errors.Any();
-
-        public ICollection<string> Errors { get; }
-
-        public ValidatorResult() =>
-            Errors = new List<string>();
     }
 }

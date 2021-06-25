@@ -26,7 +26,11 @@
         [HttpPost]
         public HttpResponse Login(UserLoginModel model)
         {
-            var validator = AttributeValidator.Validate(model);
+            if (!ModelIsVlaid(model))
+            {
+                return Error(Errors);
+            }
+
             var user = _context.Users.FirstOrDefault(x =>
                 x.Username == model.Username &&
                 x.Password == _passwordHasher.HashPassword(model.Password));
@@ -38,12 +42,12 @@
 
             if (string.IsNullOrEmpty(user.Id))
             {
-                validator.Errors.Add("Invalid Username or Password");
+                Errors.Add("Invalid Username or Password");
             }
 
-            if (validator.Errors.Any())
+            if (Errors.Any())
             {
-                return Error(validator.Errors);
+                return Error(Errors);
             }
 
             SignIn(user.Id);
@@ -57,7 +61,11 @@
         [HttpPost]
         public HttpResponse Register(UserRegisterViewModel model)
         {
-            var validator = AttributeValidator.Validate(model);
+            if (!ModelIsVlaid(model))
+            {
+                return Error(Errors);
+            }
+
             var passwordIsValid = model.Password.Equals(model.ConfirmPassword);
             var isUserExist = _context.Users.Any(x =>
                     x.Username == model.Username &&
@@ -66,22 +74,22 @@
 
             if (!passwordIsValid)
             {
-                validator.Errors.Add("Password does not match with ConfirmPassword");
+                Errors.Add("Password does not match with ConfirmPassword");
             }
 
             if (isUserExist)
             {
-                validator.Errors.Add("User is registered");
+                Errors.Add("User is registered");
             }
 
             if (isEmailAddressExist)
             {
-                validator.Errors.Add("Exist other user with this email address.");
+                Errors.Add("Exist other user with this email address.");
             }
 
-            if (validator.Errors.Any())
+            if (Errors.Any())
             {
-                return Error(validator.Errors);
+                return Error(Errors);
             }
 
             _context.Users.Add(CreateUser(model));
