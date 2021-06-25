@@ -5,7 +5,8 @@
 
     public class ValidatorResult
     {
-        public bool IsValid => !Errors.Any();
+        public bool IsValid => 
+            !Errors.Any();
 
         public ICollection<string> Errors { get; }
 

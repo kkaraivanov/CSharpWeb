@@ -7,22 +7,22 @@
 
     public class BaseControllerTemplate : Controller
     {
-        private IValidator _attributeValidator;
+        private IValidator _validator;
 
         protected bool ModelIsVlaid(object obj) =>
-            _attributeValidator
+            _validator
                 .ModelIsValid(obj);
 
         protected List<string> Errors => 
-            _attributeValidator
+            _validator
                 .Errors
                 .ToList();
 
         protected void AddError(string error) => 
-            _attributeValidator
+            _validator
                 .AddError(error);
 
         protected BaseControllerTemplate() =>
-            _attributeValidator = new Validator();
+            _validator = new Validator();
     }
 }
