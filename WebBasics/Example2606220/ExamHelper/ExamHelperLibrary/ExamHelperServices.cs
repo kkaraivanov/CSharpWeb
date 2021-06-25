@@ -14,6 +14,7 @@ namespace ExamHelperLibrary
         {
             service.Add<ApplicationDbContext>();
             service.Add<IPasswordHasher, PasswordHasher>();
+            service.Add<IValidator, Validator>();
             return service;
         }
 
