@@ -1,8 +1,7 @@
-﻿namespace Exam
+﻿namespace SharedTrip
 {
     using System.Threading.Tasks;
     using ExamHelperLibrary;
-    using ExamHelperLibrary.Services;
     using FrameworkServer;
     using FrameworkServer.Controllers;
 
@@ -15,7 +14,7 @@
                     .MapControllers())
                 .WithServices(services => services
                     .ExamHelperServicesRegister()
-                    .ExamServicesRegister())
+                    .SharedTripServicesRegister())
                 .DatabaseMigrate()
                 .Start();
     }

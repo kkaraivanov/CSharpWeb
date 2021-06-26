@@ -7,6 +7,6 @@
 
         // TODO: Add database name on connection string
         public static string GetConnectionString =>
-            "Server=.\\SQLKARAIVANOV;Database=ATestDb;Integrated Security=true;";
+            "Server=.\\SQLKARAIVANOV;Database=SharedTrip;Integrated Security=true;";
     }
 }

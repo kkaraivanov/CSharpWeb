@@ -32,7 +32,7 @@
 
                     if (!isValid)
                     {
-                        var errorMessage = validationAttribute.FormatErrorMessage(propertyName);
+                        var errorMessage = validationAttribute.FormatErrorMessage(value.ToString());
                         result.Errors.Add(errorMessage);
                     }
                 }

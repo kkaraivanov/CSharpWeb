@@ -9,11 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FrameworkServer", "Framewor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExamApp", "ExamApp", "{D7C98B6B-A711-48FB-86DC-55E2E857934D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Exam", "ExamApp\Exam.csproj", "{14B0C7BC-C6B4-45B5-A204-28C035383C19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedTrip", "ExamApp\SharedTrip.csproj", "{14B0C7BC-C6B4-45B5-A204-28C035383C19}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExamHelper", "ExamHelper", "{F9AABC9B-3918-440A-B759-DE2FA138A936}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamHelperLibrary", "ExamHelper\ExamHelperLibrary\ExamHelperLibrary.csproj", "{A75356E2-3B90-4944-8337-12BB2A61D572}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExamHelperLibrary", "ExamHelper\ExamHelperLibrary\ExamHelperLibrary.csproj", "{A75356E2-3B90-4944-8337-12BB2A61D572}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
