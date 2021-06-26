@@ -95,6 +95,11 @@
                 })
                 .FirstOrDefault();
             
+            if (trip.Seats == 0)
+            {
+                trip.IsUsed = true;
+            }
+
             return View(trip);
         }
 
